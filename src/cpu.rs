@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct CPU {
     pub a: u8,
     pub x: u8,
