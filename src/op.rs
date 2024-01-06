@@ -1,34 +1,67 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
+use {AddressingMode::*, Instruction::*};
 
 lazy_static! {
+
     static ref CPU_OP_CODES: Vec<OP> = vec![
-        // ADC
-        OP::new(0x69, Instruction::ADC, 2, 2, AddressingMode::Immediate),
-        OP::new(0x65, Instruction::ADC, 2, 3, AddressingMode::ZeroPage),
-        OP::new(0x75, Instruction::ADC, 2, 4, AddressingMode::ZeroPageX),
-        OP::new(0x6D, Instruction::ADC, 3, 4, AddressingMode::Absolute),
-        OP::new(0x7D, Instruction::ADC, 3, 4, AddressingMode::AbsoluteX),
-        OP::new(0x79, Instruction::ADC, 3, 4, AddressingMode::AbsoluteY),
-        OP::new(0x61, Instruction::ADC, 2, 6, AddressingMode::IndirectX),
-        OP::new(0x71, Instruction::ADC, 2, 5, AddressingMode::IndirectY),
+        // ADd with Carry
+        OP::new(ADC, Immediate, 0x69, 2, 2),
+        OP::new(ADC, ZeroPage, 0x65, 2, 3),
+        OP::new(ADC, ZeroPageX, 0x75, 2, 4),
+        OP::new(ADC, Absolute, 0x6D, 3, 4),
+        OP::new(ADC, AbsoluteX, 0x7D, 3, 4 /* +1 if page crossed */),
+        OP::new(ADC, AbsoluteY, 0x79, 3, 4 /* +1 if page crossed */),
+        OP::new(ADC, IndirectX, 0x61, 2, 6),
+        OP::new(ADC, IndirectY, 0x71, 2, 5 /* +1 if page crossed */),
 
         // AND
-        OP::new(0x29, Instruction::AND, 2, 2, AddressingMode::Immediate),
-        OP::new(0x25, Instruction::AND, 2, 3, AddressingMode::ZeroPage),
-        OP::new(0x35, Instruction::AND, 2, 4, AddressingMode::ZeroPageX),
-        OP::new(0x2D, Instruction::AND, 3, 4, AddressingMode::Absolute),
-        OP::new(0x3D, Instruction::AND, 3, 4, AddressingMode::AbsoluteX),
-        OP::new(0x39, Instruction::AND, 3, 4, AddressingMode::AbsoluteY),
-        OP::new(0x21, Instruction::AND, 2, 6, AddressingMode::IndirectX),
-        OP::new(0x31, Instruction::AND, 2, 5, AddressingMode::IndirectY),
+        OP::new(AND, Immediate, 0x29, 2, 2),
+        OP::new(AND, ZeroPage, 0x25, 2, 3),
+        OP::new(AND, ZeroPageX, 0x35, 2, 4),
+        OP::new(AND, Absolute, 0x2D, 3, 4),
+        OP::new(AND, AbsoluteX, 0x3D, 3, 4 /* +1 if page crossed */),
+        OP::new(AND, AbsoluteY, 0x39, 3, 4 /* +1 if page crossed */),
+        OP::new(AND, IndirectX, 0x21, 2, 6),
+        OP::new(AND, IndirectY, 0x31, 2, 5 /* +1 if page crossed */),
 
-        // ASL
-        OP::new(0x0A, Instruction::ASL, 1, 2, AddressingMode::Accumulator),
-        OP::new(0x06, Instruction::ASL, 2, 5, AddressingMode::ZeroPage),
-        OP::new(0x16, Instruction::ASL, 2, 6, AddressingMode::ZeroPageX),
-        OP::new(0x0E, Instruction::ASL, 3, 6, AddressingMode::Absolute),
-        OP::new(0x1E, Instruction::ASL, 3, 7, AddressingMode::AbsoluteX),
+        // Arithmetic Shift Left
+        OP::new(ASL, Accumulator, 0x0A, 1, 2),
+        OP::new(ASL, ZeroPage, 0x06, 2, 5),
+        OP::new(ASL, ZeroPageX, 0x16, 2, 6),
+        OP::new(ASL, Absolute, 0x0E, 3, 6),
+        OP::new(ASL, AbsoluteX, 0x1E, 3, 7),
+
+        // Branch if Carry Clear
+        OP::new(BCC, Relative, 0x90, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // Branch if Carry Set
+        OP::new(BCS, Relative, 0xB0, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // Branch if EQual
+        OP::new(BEQ, Relative, 0xF0, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // BIt Test
+        OP::new(BIT, ZeroPage, 0x24, 2, 3),
+        OP::new(BIT, Absolute, 0x2C, 3, 4),
+
+        // Branch if MInus
+        OP::new(BMI, Relative, 0x30, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // Branch if Not Equal
+        OP::new(BNE, Relative, 0xD0, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // Branch if Positive
+        OP::new(BPL, Relative, 0x10, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // Force Interrupt
+        OP::new(BRK, NoneAddressing, 0x00, 1, 7),
+
+        // Branch if Overflow Clear
+        OP::new(BVC, Relative, 0x50, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // Branch if Overflow Set
+        OP::new(BVS, Relative, 0x70, 2, 2 /* +1 if branched, +2 if to a new page */),
 
     ];
 
@@ -54,11 +87,11 @@ pub struct OP {
 
 impl OP {
     pub fn new(
-        code: u8,
         instruction: Instruction,
+        mode: AddressingMode,
+        code: u8,
         len: u8,
         cycles: u8,
-        mode: AddressingMode,
     ) -> Self {
         Self {
             code,
@@ -133,6 +166,7 @@ pub enum Instruction {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AddressingMode {
     Immediate,
+    Relative,
     ZeroPage,
     ZeroPageX,
     ZeroPageY,
