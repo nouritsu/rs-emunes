@@ -54,14 +54,46 @@ lazy_static! {
         // Branch if Positive
         OP::new(BPL, Relative, 0x10, 2, 2 /* +1 if branched, +2 if to a new page */),
 
-        // Force Interrupt
+        // force interrupt
         OP::new(BRK, NoneAddressing, 0x00, 1, 7),
 
-        // Branch if Overflow Clear
+        // Branch if oVerflow Clear
         OP::new(BVC, Relative, 0x50, 2, 2 /* +1 if branched, +2 if to a new page */),
 
-        // Branch if Overflow Set
+        // Branch if oVerflow Set
         OP::new(BVS, Relative, 0x70, 2, 2 /* +1 if branched, +2 if to a new page */),
+
+        // CLear Carry flag
+        OP::new(CLC, NoneAddressing, 0x18, 1, 2),
+
+        // CLear Decimal mode
+        OP::new(CLD, NoneAddressing, 0xD8, 1, 2),
+
+        // CLear Interrupt disable
+        OP::new(CLI, NoneAddressing, 0x58, 1, 2),
+
+        // CLear oVerflow flag
+        OP::new(CLV, NoneAddressing, 0xB8, 1, 2),
+
+        // CoMPare
+        OP::new(CMP, Immediate, 0xC9, 2, 2),
+        OP::new(CMP, ZeroPage, 0xC5, 2, 3),
+        OP::new(CMP, ZeroPageX, 0xD5, 2, 4),
+        OP::new(CMP, Absolute, 0xCD, 3, 4),
+        OP::new(CMP, AbsoluteX, 0xDD, 3, 4 /* +1 if page crossed */),
+        OP::new(CMP, AbsoluteY, 0xD9, 3, 4 /* +1 if page crossed */),
+        OP::new(CMP, IndirectX, 0xC1, 2, 6),
+        OP::new(CMP, IndirectY, 0xD1, 2, 5 /* +1 if page crossed */),
+
+        // ComPare X register
+        OP::new(CPX, Immediate, 0xE0, 2, 2),
+        OP::new(CPX, ZeroPage, 0xE4, 2, 3),
+        OP::new(CPX, Absolute, 0xEC, 3, 4),
+
+        // ComPare Y register
+        OP::new(CPY, Immediate, 0xC0, 2, 2),
+        OP::new(CPY, ZeroPage, 0xC4, 2, 3),
+        OP::new(CPY, Absolute, 0xCC, 3, 4),
 
     ];
 
