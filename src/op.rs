@@ -106,6 +106,16 @@ lazy_static! {
 
         // DEcrement Y register
         OP::new(DEY, NoneAddressing, 0x88, 1, 2),
+
+        // Exclusive OR
+        OP::new(EOR, Immediate, 0x49, 2, 2),
+        OP::new(EOR, ZeroPage, 0x45, 2, 3),
+        OP::new(EOR, ZeroPageX, 0x55, 2, 4),
+        OP::new(EOR, Absolute, 0x4D, 3, 4),
+        OP::new(EOR, AbsoluteX, 0x5D, 3, 4 /* +1 if page crossed */),
+        OP::new(EOR, AbsoluteY, 0x59, 3, 4 /* +1 if page crossed */),
+        OP::new(EOR, IndirectX, 0x41, 2, 6),
+        OP::new(EOR, IndirectY, 0x51, 2, 5 /* +1 if page crossed */),
     ];
 
     pub static ref OPCODES: HashMap<u8, &'static OP> = {
