@@ -95,6 +95,17 @@ lazy_static! {
         OP::new(CPY, ZeroPage, 0xC4, 2, 3),
         OP::new(CPY, Absolute, 0xCC, 3, 4),
 
+        // DECrement Memory
+        OP::new(DEC, ZeroPage, 0xC6, 2, 5),
+        OP::new(DEC, ZeroPageX, 0xD6, 2, 6),
+        OP::new(DEC, Absolute, 0xCE, 3, 6),
+        OP::new(DEC, AbsoluteX, 0xDE, 3, 7),
+
+        // DEcrement X register
+        OP::new(DEX, NoneAddressing, 0xCA, 1, 2),
+
+        // DEcrement Y register
+        OP::new(DEY, NoneAddressing, 0x88, 1, 2),
     ];
 
     pub static ref OPCODES: HashMap<u8, &'static OP> = {
