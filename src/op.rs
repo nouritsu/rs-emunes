@@ -116,6 +116,59 @@ lazy_static! {
         OP::new(EOR, AbsoluteY, 0x59, 3, 4 /* +1 if page crossed */),
         OP::new(EOR, IndirectX, 0x41, 2, 6),
         OP::new(EOR, IndirectY, 0x51, 2, 5 /* +1 if page crossed */),
+
+        // INCrement memory
+        OP::new(INC, ZeroPage, 0xE6, 2, 5),
+        OP::new(INC, ZeroPageX, 0xF6, 2, 6),
+        OP::new(INC, Absolute, 0xEE, 3, 6),
+        OP::new(INC, AbsoluteX, 0xFE, 3, 7),
+
+        // INcrement X register
+        OP::new(INX, NoneAddressing, 0xE8, 1, 2),
+
+        // INcrement Y register
+        OP::new(INY, NoneAddressing, 0xC8, 1, 2),
+
+        // JuMP
+        OP::new(JMP, Absolute, 0x4C, 3, 3),
+        OP::new(JMP, Indirect, 0x6C, 3, 5),
+
+        // Jump to SubRoutine
+        OP::new(JSR, Absolute, 0x20, 3, 6),
+
+        // LoaD Accumulator
+        OP::new(LDA, Immediate, 0xA9, 2, 2),
+        OP::new(LDA, ZeroPage, 0xA5, 2, 3),
+        OP::new(LDA, ZeroPageX, 0xB5, 2, 4),
+        OP::new(LDA, Absolute, 0xAD, 3, 4),
+        OP::new(LDA, AbsoluteX, 0xBD, 3, 4 /* +1 if page crossed */),
+        OP::new(LDA, AbsoluteY, 0xB9, 3, 4 /* +1 if page crossed */),
+        OP::new(LDA, IndirectX, 0xA1, 2, 6),
+        OP::new(LDA, IndirectY, 0xA9, 2, 5 /* +1 if page crossed */),
+
+        // LoaD X register
+        OP::new(LDX, Immediate, 0xA2, 2, 2),
+        OP::new(LDX, ZeroPage, 0xA6, 2, 3),
+        OP::new(LDX, ZeroPageY, 0xB6, 2, 4),
+        OP::new(LDX, Absolute, 0xAE, 3, 4),
+        OP::new(LDX, AbsoluteY, 0xA2, 3, 4 /* +1 if page crossed */),
+
+        // LoaD Y register
+        OP::new(LDY, Immediate, 0xA0, 2, 2),
+        OP::new(LDY, ZeroPage, 0xA4, 2, 3),
+        OP::new(LDY, ZeroPageY, 0xB4, 2, 4),
+        OP::new(LDY, Absolute, 0xAC, 3, 4),
+        OP::new(LDY, AbsoluteY, 0xBC, 3, 4 /* +1 if page crossed */),
+
+        // Logical Shift Right
+        OP::new(LSR, Accumulator, 0x4A, 1, 2),
+        OP::new(LSR, ZeroPage, 0x46, 2, 5),
+        OP::new(LSR, ZeroPageX, 0x56, 2, 6),
+        OP::new(LSR, Absolute, 0x4E, 3, 6),
+        OP::new(LSR, AbsoluteY, 0x5E, 3, 7),
+
+        // No OPeration
+        OP::new(NOP, NoneAddressing, 0xEA, 1, 2),
     ];
 
     pub static ref OPCODES: HashMap<u8, &'static OP> = {
@@ -188,7 +241,7 @@ pub enum Instruction {
     JMP,
     JSR,
     LDA,
-    LDS,
+    LDX,
     LDY,
     LSR,
     NOP,
@@ -226,6 +279,7 @@ pub enum AddressingMode {
     Absolute,
     AbsoluteX,
     AbsoluteY,
+    Indirect,
     IndirectX,
     IndirectY,
     Accumulator,
