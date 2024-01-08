@@ -1,4 +1,4 @@
-use crate::{
+use super::{
     mem::Mem,
     op::{AddressingMode, OPCODES},
 };
