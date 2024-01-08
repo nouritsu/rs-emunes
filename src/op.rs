@@ -26,42 +26,42 @@ lazy_static! {
         OP::new(AND, IndirectY, 0x31, 2, 5 /* +1 if page crossed */),
 
         // Arithmetic Shift Left
-        OP::new(ASL, Accumulator, 0x0A, 1, 2),
+        OP::new(ASL, NoneAddressing, 0x0A, 1, 2),
         OP::new(ASL, ZeroPage, 0x06, 2, 5),
         OP::new(ASL, ZeroPageX, 0x16, 2, 6),
         OP::new(ASL, Absolute, 0x0E, 3, 6),
         OP::new(ASL, AbsoluteX, 0x1E, 3, 7),
 
         // Branch if Carry Clear
-        OP::new(BCC, Relative, 0x90, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BCC, NoneAddressing, 0x90, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // Branch if Carry Set
-        OP::new(BCS, Relative, 0xB0, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BCS, NoneAddressing, 0xB0, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // Branch if EQual
-        OP::new(BEQ, Relative, 0xF0, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BEQ, NoneAddressing, 0xF0, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // BIt Test
         OP::new(BIT, ZeroPage, 0x24, 2, 3),
         OP::new(BIT, Absolute, 0x2C, 3, 4),
 
         // Branch if MInus
-        OP::new(BMI, Relative, 0x30, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BMI, NoneAddressing, 0x30, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // Branch if Not Equal
-        OP::new(BNE, Relative, 0xD0, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BNE, NoneAddressing, 0xD0, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // Branch if Positive
-        OP::new(BPL, Relative, 0x10, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BPL, NoneAddressing, 0x10, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // force interrupt
         OP::new(BRK, NoneAddressing, 0x00, 1, 7),
 
         // Branch if oVerflow Clear
-        OP::new(BVC, Relative, 0x50, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BVC, NoneAddressing, 0x50, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // Branch if oVerflow Set
-        OP::new(BVS, Relative, 0x70, 2, 2 /* +1 if branched, +2 if to a new page */),
+        OP::new(BVS, NoneAddressing, 0x70, 2, 2 /* +1 if branched, +2 if to a new page */),
 
         // CLear Carry flag
         OP::new(CLC, NoneAddressing, 0x18, 1, 2),
@@ -130,8 +130,8 @@ lazy_static! {
         OP::new(INY, NoneAddressing, 0xC8, 1, 2),
 
         // JuMP
-        OP::new(JMP, Absolute, 0x4C, 3, 3),
-        OP::new(JMP, Indirect, 0x6C, 3, 5),
+        OP::new(JMP, NoneAddressing /* Technically, this is Immediate */, 0x4C, 3, 3),
+        OP::new(JMP, NoneAddressing /* Indirect with 6502 Bug */, 0x6C, 3, 5),
 
         // Jump to SubRoutine
         OP::new(JSR, Absolute, 0x20, 3, 6),
@@ -161,7 +161,7 @@ lazy_static! {
         OP::new(LDY, AbsoluteY, 0xBC, 3, 4 /* +1 if page crossed */),
 
         // Logical Shift Right
-        OP::new(LSR, Accumulator, 0x4A, 1, 2),
+        OP::new(LSR, NoneAddressing, 0x4A, 1, 2),
         OP::new(LSR, ZeroPage, 0x46, 2, 5),
         OP::new(LSR, ZeroPageX, 0x56, 2, 6),
         OP::new(LSR, Absolute, 0x4E, 3, 6),
@@ -272,16 +272,13 @@ pub enum Instruction {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AddressingMode {
     Immediate,
-    Relative,
     ZeroPage,
     ZeroPageX,
     ZeroPageY,
     Absolute,
     AbsoluteX,
     AbsoluteY,
-    Indirect,
     IndirectX,
     IndirectY,
-    Accumulator,
     NoneAddressing,
 }
